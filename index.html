@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User Management Website</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background: repeating-linear-gradient(45deg, #d60ac2, #000000);
+      color: #333;
+    }
+    .container {
+      background: white;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+      width: 400px;
+      text-align: center;
+      animation: fadeIn 0.5s ease-in-out;
+    }
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    input {
+      width: calc(100% - 20px);
+      padding: 12px 10px;
+      margin: 10px 0;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      outline: none;
+      font-size: 16px;
+      transition: border-color 0.3s;
+    }
+    input:focus {
+      border-color: #2575fc;
+    }
+    button {
+      width: 100%;
+      padding: 12px;
+      background: #2575fc;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: bold;
+      transition: background-color 0.3s, transform 0.2s;
+    }
+    button:hover {
+  background: #ffffff; 
+  color: #cb1190; 
+  transform: scale(1.02);
+    }
+    button:active {
+      transform: scale(0.98);
+    }
+    .hidden {
+      display: none;
+    }
+    p {
+      margin-top: 15px;
+      font-size: 14px;
+      color: #555;
+    }
+    p button {
+      background: none;
+      border: none;
+      color: #2575fc;
+      cursor: pointer;
+      font-size: 14px;
+      text-decoration: underline;
+    }
+    p button:hover {
+      color: #6a11cb;
+    }
+    h1 {
+      color: #333;
+      margin-bottom: 20px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 12px;
+      text-align: center;
+    }
+    th {
+      background-color: #f4f4f4;
+      font-size: 16px;
+    }
+    td {
+      font-size: 14px;
+    }
+    @media (max-width: 600px) {
+      table {
+        font-size: 12px;
+      }
+      th, td {
+        padding: 8px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <!-- Login Page -->
+  <div id="login-page">
+    <h1>Login</h1>
+    <div class="form-group">
+      <label for="login-username">Username:</label>
+      <input type="text" id="login-username" placeholder="Enter your username" required>
+    </div>
+    <div class="form-group">
+      <label for="login-password">Password:</label>
+      <input type="password" id="login-password" placeholder="Enter your password" required>
+    </div>
+    <button onclick="login()">Login</button>
+    <p>New user? <button type="button" onclick="showRegisterPage()">Register here</button></p>
+  </div>
+
+  <!-- Registration Page -->
+  <div id="register-page" class="hidden">
+    <h1>Register</h1>
+    <div class="form-group">
+      <label for="register-username">Username:</label>
+      <input type="text" id="register-username" placeholder="Choose a username" required>
+    </div>
+    <div class="form-group">
+      <label for="register-password">Password:</label>
+      <input type="password" id="register-password" placeholder="Choose a password" required>
+    </div>
+    <div class="form-group">
+      <label for="register-email">Email:</label>
+      <input type="email" id="register-email" placeholder="Enter your email" required>
+    </div>
+    <div class="form-group">
+      <label for="register-bio">Bio:</label>
+      <input type="text" id="register-bio" placeholder="Write a short bio" required>
+    </div>
+    <div class="form-group">
+        <label for="register-age">Age:</label>
+        <input type="number" id="register-age" placeholder="Enter your age" required>
+    </div>
+    <button onclick="register()">Register</button>
+    <p>Already have an account? <button type="button" onclick="showLoginPage()">Login here</button></p>
+  </div>
+
+  <!-- User Information Page -->
+  <div id="user-info-page" class="hidden">
+    <h1>Registered Users</h1>
+    <table>
+      <thead>
+        <tr>
+          <th>Username</th>
+          <th>Email</th>
+          <th>Bio</th>
+          <th>Age</th>
+        </tr>
+      </thead>
+      <tbody id="user-table-body">
+        <!-- Dynamic user data -->
+      </tbody>
+    </table>
+    <button onclick="goToProfile()">View My Profile</button>
+  </div>
+
+  <!-- Personal Profile Page -->
+  <div id="profile-page" class="hidden">
+    <h1>Personal Profile</h1>
+    <div class="profile-info">
+      <p><strong>Username:</strong> <span id="profile-username"></span></p>
+      <p><strong>Email:</strong> <span id="profile-email"></span></p>
+      <p><strong>Bio:</strong> <span id="profile-bio"></span></p>
+      <p><strong>Age:</strong> <span id="profile-age"></span></p>
+    </div>
+    <button onclick="logout()">Logout</button>
+  </div>
+</div>
+
+<script>
+  // Simulated user data
+  const users = [
+    { username: "john", password: "12345", email: "john@example.com", bio: "Software Developer", age: 28 },
+    { username: "jane", password: "password", email: "jane@example.com", bio: "Data Scientist", age: 33 },
+    { username: "doe", password: "admin", email: "doe@example.com", bio: "Project Manager", age: 27 }
+  ];
+
+  let loggedInUser = null;
+
+  // Login function
+  function login() {
+    const username = document.getElementById("login-username").value;
+    const password = document.getElementById("login-password").value;
+
+    const user = users.find(u => u.username === username && u.password === password);
+
+    if (user) {
+      loggedInUser = user;
+      alert("Login successful!");
+      document.getElementById("login-page").classList.add("hidden");
+      document.getElementById("user-info-page").classList.remove("hidden");
+      loadUserTable();
+    } else {
+      alert("Invalid username or password!");
+    }
+  }
+
+  // Registration function
+  function register() {
+    const username = document.getElementById("register-username").value;
+    const password = document.getElementById("register-password").value;
+    const email = document.getElementById("register-email").value;
+    const bio = document.getElementById("register-bio").value;
+    const age = document.getElementById("register-age").value;
+
+    if (username && password && email && bio) {
+      users.push({ username, password, email, bio, age });
+      alert("Registration successful! Please log in.");
+      showLoginPage();
+    } else {
+      alert("All fields are required!");
+    }
+  }
+
+  // Load user table
+  function loadUserTable() {
+    const tableBody = document.getElementById("user-table-body");
+    tableBody.innerHTML = "";
+
+    users.forEach(user => {
+      const row = `
+        <tr>
+          <td>${user.username}</td>
+          <td>${user.email}</td>
+          <td>${user.bio}</td>
+          <td>${user.age}</td>
+        </tr>
+      `;
+      tableBody.innerHTML += row;
+    });
+  }
+
+  // View profile function
+  function goToProfile() {
+    document.getElementById("user-info-page").classList.add("hidden");
+    document.getElementById("profile-page").classList.remove("hidden");
+
+    document.getElementById("profile-username").textContent = loggedInUser.username;
+    document.getElementById("profile-email").textContent = loggedInUser.email;
+    document.getElementById("profile-bio").textContent = loggedInUser.bio;
+    document.getElementById("profile-age").textContent = loggedInUser.age;
+  }
+
+  // Show registration page
+  function showRegisterPage() {
+    document.getElementById("login-page").classList.add("hidden");
+    document.getElementById("register-page").classList.remove("hidden");
+  }
+
+  // Show login page
+  function showLoginPage() {
+    document.getElementById("register-page").classList.add("hidden");
+    document.getElementById("login-page").classList.remove("hidden");
+  }
+
+  // Logout function
+  function logout() {
+    loggedInUser = null;
+    document.getElementById("profile-page").classList.add("hidden");
+    document.getElementById("login-page").classList.remove("hidden");
+  }
+</script>
+
+</body>
+</html>
